@@ -24,9 +24,9 @@ server {
     listen 80;
     server_name sprt.dev;
 
-    # Redirect all HTTP requests to HTTPS when is not curl
+    # Disable everything that isn't curl
     if (\$http_user_agent !~* curl) {
-        return 301 https://\$host\$request_uri;
+        return 404;
     }
     
     location / {
