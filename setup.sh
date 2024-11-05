@@ -39,6 +39,29 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
+
+server {
+    listen 443 ssl;
+    server_name sprt.dev;
+
+    # Disable everything that isn't curl
+    if (\$http_user_agent !~* curl) {
+        return 404;
+    }
+
+    ssl_certificate /etc/letsencrypt/live/sprt.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/sprt.dev/privkey.pem;
+    
+    location / {
+        limit_req zone=mylimit burst=20 nodelay;
+        
+        proxy_pass http://localhost:7778; 
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
 EOL
 
 sudo ln -s /etc/nginx/sites-available/purple-pages /etc/nginx/sites-enabled/purple-pages
